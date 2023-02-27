@@ -56,7 +56,7 @@ class Title(models.Model):
     year = models.PositiveIntegerField()
     description = models.TextField(blank=True, null=True)
     genre = models.ManyToManyField(Genre)
-    category = models.ForeignKey(Category)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
     rating = models.PositiveIntegerField()
 
     def __str__(self):
