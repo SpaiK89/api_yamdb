@@ -11,15 +11,11 @@ class User(AbstractUser):
         (MODERATOR, "Модератор"),
         (ADMIN, "Администратор"),
     )
-    email = models.EmailField(
-        "Электронная почта", unique=True, max_length=200,
-    )
+    email = models.EmailField("Электронная почта", unique=True, max_length=200)
     role = models.CharField(
         "Роль", max_length=30, default=USER, choices=USERS_ROLE,
     )
-    bio = models.TextField(
-        "Обо мне", max_length=300, blank=True
-    )
+    bio = models.TextField("Обо мне", max_length=300, blank=True)
 
     class Meta:
         ordering = ("username",)
