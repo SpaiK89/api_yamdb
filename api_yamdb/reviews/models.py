@@ -1,4 +1,3 @@
-from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -12,7 +11,8 @@ class User(AbstractUser):
         (MODERATOR, "Модератор"),
         (ADMIN, "Администратор"),
     )
-    email = models.EmailField("Электронная почта", unique=True, max_length=200)
+    first_name = models.CharField("first name", max_length=150, blank=True)
+    email = models.EmailField("Электронная почта", unique=True, max_length=254)
     role = models.CharField(
         "Роль", max_length=30, default=USER, choices=USERS_ROLE,
     )
@@ -72,6 +72,8 @@ class Title(models.Model):
         related_name='category',
         verbose_name='Категория',
     )
+    # Убрал поле raiting, так как он должно будет каждый раз вычисляться
+    # во вьюсете Апи
 
     class Meta:
         verbose_name = 'Произведение'
