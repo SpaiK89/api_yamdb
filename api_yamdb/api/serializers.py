@@ -28,15 +28,13 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Нельзя создать пользователя с таким 'username'"
             )
-        if User.objects.filter(
-            username=username
-        ) and User.objects.get(username=username) != email:
+        if (User.objects.filter(username=username) and
+                User.objects.get(username=username).email != email):
             raise serializers.ValidationError(
                 "Указанный 'username' уже занят, используйте другой"
             )
-        if User.objects.filter(
-            email=email
-        ) and User.objects.get(email=email) != username:
+        if (User.objects.filter(email=email) and
+                User.objects.get(email=email).username != username):
             raise serializers.ValidationError(
                 "Указанный адрес электронной почты уже занят, используйте "
                 "другой"
