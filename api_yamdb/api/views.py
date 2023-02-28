@@ -14,9 +14,9 @@ from .serializers import (
     SignUpSerializer,
     TokenSerializer,
     UserSerializer,
-    # CategorySerializer,
-    # GenreSerializer,
-    # TitleSerializer
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer
 )
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -39,32 +39,32 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.save(role=user.role, partial=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-#
-# class CategoryViewSet(viewsets.ModelViewSet):
-#     # добавить Поиск по названию категории
-#     # проверить работу пагинации
-#     # добавить permissions IsAdminOrReadOnly
-#     queryset = Category.objects.all()
-#     serializer_class = CategorySerializer
-#
-#
-# class GenreViewSet(viewsets.ModelViewSet):
-#     # добавить Поиск по названию жанра
-#     # проверить работу пагинации
-#     # добавить permissions IsAdminOrReadOnly
-#     queryset = Genre.objects.all()
-#     serializer_class = GenreSerializer
-#
-#
-# class TitleViewSet(viewsets.ModelViewSet):
-#     # добавить возможность фильтрации по категории, жанру, году и названию произведения
-#     # добавить permissions IsAdminOrReadOnly
-#     # возможно, придется добавить IsAuthenticatedOrReadOnly из базовых,нонужно затестить
-#     # добавить валидацию по году выпуска
-#     # проверить работу пагинации
-#     # добавить get_queryset, в котором высчитывается и выводится rating
-#     queryset = Title.objects.all()
-#     serializer_class = TitleSerializer
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    # добавить Поиск по названию категории
+    # проверить работу пагинации
+    # добавить permissions IsAdminOrReadOnly
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    # добавить Поиск по названию жанра
+    # проверить работу пагинации
+    # добавить permissions IsAdminOrReadOnly
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    # добавить возможность фильтрации по категории, жанру, году и названию произведения
+    # добавить permissions IsAdminOrReadOnly
+    # возможно, придется добавить IsAuthenticatedOrReadOnly из базовых,нонужно затестить
+    # добавить валидацию по году выпуска
+    # проверить работу пагинации
+    # добавить get_queryset, в котором высчитывается и выводится rating
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
 
 
 @api_view(["POST"])
