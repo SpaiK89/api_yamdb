@@ -75,6 +75,9 @@ class Review(models.Model):
             ),
         ]
 
+    def __str__(self):
+        return self.text[:20]
+
 
 class Comment(models.Model):
     review = models.ForeignKey(
@@ -102,3 +105,6 @@ class Comment(models.Model):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         ordering = ['pub_date']
+
+    def __str__(self):
+        return self.text[:20]
