@@ -6,7 +6,7 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Category, Genre, Title, User, Review
 from .permisions import (
     IsAdmin, IsAuthorOrAdminOrModerator, IsAdminOrReadOnly
 )
@@ -16,7 +16,9 @@ from .serializers import (
     UserSerializer,
     CategorySerializer,
     GenreSerializer,
-    TitleSerializer
+    TitleSerializer,
+    CommentSerializer,
+    ReviewSerializer
 )
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -103,3 +105,39 @@ def get_token(request):
         {"WRONG CODE": "Неверный код подтверждения"},
         status=status.HTTP_400_BAD_REQUEST
     )
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthorOrAdminOrModerator]
+
+    def get_title(self):
+        return get_object_or_404(Title, pk=self.kwargs.get("title_id"))
+
+    def get_queryset(self):
+        title = self.get_title()
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title = self.get_title()
+        serializer.save(author=self.request.user, title=title)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthorOrAdminOrModerator]
+
+    def get_rewiew(self):
+        return get_object_or_404(
+            Review,
+            pk=self.kwargs.get('review_id'),
+            title__id=self.kwargs.get('title_id'),
+        )
+
+    def get_queryset(self):
+        review = self.get_rewiew()
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review = self.get_rewiew()
+        serializer.save(author=self.request.user, review=review)
