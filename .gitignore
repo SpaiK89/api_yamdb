@@ -147,4 +147,13 @@ dmypy.json
 
 # папки со статикой и медиа
 media/
+static/
+.media/
+.static/
+
+# managament-команды
+.management/
+management/
+.commands/
+commands/
 

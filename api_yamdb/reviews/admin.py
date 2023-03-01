@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Comment, Review
+from .models import User, Comment, Review, Title, Genre, Category
 
 admin.site.site_header = 'Панель администратора'
 admin.site.site_title = 'Управление проектом'
@@ -28,8 +28,28 @@ class CommentAdmin(admin.ModelAdmin):
     list_editable = ('author', 'review', 'text',)
     empty_value_display = VALUE_DISPLAY
 
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug',)
+    search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
+
+
+class GenreAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug',)
+    search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
+
+
+class TitleAdmin(admin.ModelAdmin):
+    list_display = ('name', 'year', 'description', 'category',)
+    search_fields = ('name', 'description',)
+    list_filter = ('year', 'genre', 'category',)
 # зарегистрируйте здесь свои модели
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Comment, CommentAdmin)
+admin.site.register(Title, TitleAdmin)
+admin.site.register(Genre, GenreAdmin)
+admin.site.register(Category, CategoryAdmin)
