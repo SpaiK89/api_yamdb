@@ -45,6 +45,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+        ordering = ('slug',)
 
     def __str__(self):
         return self.name
@@ -57,6 +58,7 @@ class Genre(models.Model):
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
+        ordering = ('slug',)
 
     def __str__(self):
         return self.name
@@ -76,6 +78,7 @@ class Title(models.Model):
         related_name='category',
         verbose_name='Категория',
     )
+
     # Убрал поле raiting, так как он должно будет каждый раз вычисляться
     # во вьюсете Апи
 
@@ -94,7 +97,7 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews'
     )
-    text = models.TextField(verbose_name='Текст',)
+    text = models.TextField(verbose_name='Текст', )
     author = models.ForeignKey(
         User,
         verbose_name='Автор',
@@ -136,7 +139,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments'
     )
-    text = models.TextField(verbose_name='Текст',)
+    text = models.TextField(verbose_name='Текст', )
     author = models.ForeignKey(
         User,
         verbose_name='Пользователь',
