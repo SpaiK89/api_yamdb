@@ -45,7 +45,7 @@ class TitleAdmin(admin.ModelAdmin):
     list_display = ('name', 'year', 'description', 'category',)
     search_fields = ('name', 'description',)
     list_filter = ('year', 'genre', 'category',)
-# зарегистрируйте здесь свои модели
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Review, ReviewAdmin)

@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from rest_framework.generics import get_object_or_404
 from rest_framework import serializers
 
@@ -9,14 +10,18 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            "username", "first_name", "last_name", "email", "role", "bio"
+            "username", "email", "first_name", "last_name", "bio", "role"
         )
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-
+    username = serializers.CharField(
+        required=True, max_length=150,
+        validators=[RegexValidator(regex=r"^[\w.@+-]+$")]
+    )
+    # В модели AbstracUser уже используется необходимая валидация
+    # username_validator, но pytest требует еще, то же самое с длиной email
+    email = serializers.EmailField(required=True, max_length=254)
 
     class Meta:
         model = User
@@ -29,13 +34,13 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Нельзя создать пользователя с таким 'username'"
             )
-        if (User.objects.filter(username=username) and
-                User.objects.get(username=username).email != email):
+        if (User.objects.filter(username=username)
+                and User.objects.get(username=username).email != email):
             raise serializers.ValidationError(
                 "Указанный 'username' уже занят, используйте другой"
             )
-        if (User.objects.filter(email=email) and
-                User.objects.get(email=email).username != username):
+        if (User.objects.filter(email=email)
+                and User.objects.get(email=email).username != username):
             raise serializers.ValidationError(
                 "Указанный адрес электронной почты уже занят, используйте "
                 "другой"
@@ -65,11 +70,26 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    # добавить дополнительное поле raiting
+    rating = serializers.IntegerField(read_only=True)
+    genre = GenreSerializer(read_only=True, many=True)
+    category = CategorySerializer(read_only=True)
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'genre', 'category', 'rating')
+        fields = "__all__"
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Category.objects.all()
+    )
+    genre = serializers.SlugRelatedField(
+        many=True, slug_field="slug", queryset=Genre.objects.all()
+    )
+
+    class Meta:
+        fields = "__all__"
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -95,17 +115,12 @@ class ReviewSerializer(serializers.ModelSerializer):
                 )
         return data
 
-
     class Meta:
         model = Review
         fields = '__all__'
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    review = serializers.SlugRelatedField(
-        slug_field='text',
-        read_only=True
-    )
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
@@ -113,4 +128,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'pub_date')

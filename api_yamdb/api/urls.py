@@ -5,7 +5,7 @@ from . import views
 router_v1 = DefaultRouter()
 router_v1.register('categories', views.CategoryViewSet, basename='categories')
 router_v1.register('genres', views.GenreViewSet, basename='genres')
-router_v1.register('titles', views.GenreViewSet, basename='titles')
+router_v1.register('titles', views.TitleViewSet, basename='titles')
 router_v1.register('users', views.UserViewSet, basename='users')
 router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews',
@@ -13,7 +13,7 @@ router_v1.register(
 )
 router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
-    views.CommentsViewSet, basename='comments',
+    views.CommentViewSet, basename='comments',
 )
 
 authentication = [
