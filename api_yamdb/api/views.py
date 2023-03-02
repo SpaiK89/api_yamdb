@@ -1,12 +1,16 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from rest_framework import viewsets, status, permissions
+from rest_framework import filters, viewsets, status, permissions
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Title, User, Review
+
+from .filters import TitleFilter
 from .permisions import (
     IsAdmin, IsAuthorOrAdminOrModerator, IsAdminOrReadOnly
 )
@@ -17,6 +21,7 @@ from .serializers import (
     CategorySerializer,
     GenreSerializer,
     TitleSerializer,
+    TitleCreateSerializer,
     CommentSerializer,
     ReviewSerializer
 )
@@ -43,11 +48,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    # добавить Поиск по названию категории
-    # проверить работу пагинации
-    # добавить permissions IsAdminOrReadOnly
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
@@ -56,17 +62,30 @@ class GenreViewSet(viewsets.ModelViewSet):
     # добавить permissions IsAdminOrReadOnly
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    # добавить возможность фильтрации по категории, жанру, году и названию произведения
-    # добавить permissions IsAdminOrReadOnly
-    # возможно, придется добавить IsAuthenticatedOrReadOnly из базовых,нонужно затестить
-    # добавить валидацию по году выпуска
-    # проверить работу пагинации
-    # добавить get_queryset, в котором высчитывается и выводится rating
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    permission_classes = (
+        #permissions.IsAuthenticatedOrReadOnly,
+        IsAdminOrReadOnly,
+    )
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ("create", "update", "partial_update"):
+            return TitleCreateSerializer
+        return TitleSerializer
+
+    def get_queryset(self):
+        return Title.objects.annotate(rating=Avg(
+            "reviews__score")).order_by("id")
 
 
 @api_view(["POST"])

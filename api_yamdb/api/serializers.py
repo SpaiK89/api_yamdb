@@ -6,11 +6,10 @@ from reviews.models import User, Category, Genre, Title, Review, Comment
 
 class UserSerializer(serializers.ModelSerializer):
 
+
     class Meta:
         model = User
-        fields = (
-            "username", "first_name", "last_name", "email", "role", "bio"
-        )
+        fields = ("username", "email", "first_name", "last_name", "bio", "role")
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -65,11 +64,27 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    # добавить дополнительное поле raiting
+    rating = serializers.IntegerField(read_only=True)
+    genre = GenreSerializer(read_only=True, many=True)
+    category = CategorySerializer(read_only=True)
+
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'genre', 'category', 'rating')
+        fields = "__all__"
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Category.objects.all()
+    )
+    genre = serializers.SlugRelatedField(
+        many=True, slug_field="slug", queryset=Genre.objects.all()
+    )
+
+    class Meta:
+        fields = "__all__"
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -102,10 +117,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    review = serializers.SlugRelatedField(
-        slug_field='text',
-        read_only=True
-    )
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True
@@ -113,4 +124,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'pub_date')
