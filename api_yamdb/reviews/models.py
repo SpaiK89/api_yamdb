@@ -114,7 +114,6 @@ class Review(models.Model):
         db_index=True
     )
 
-
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
@@ -149,7 +148,6 @@ class Comment(models.Model):
         auto_now_add=True,
         db_index=True
     )
-
 
     class Meta:
         verbose_name = 'Комментарий'

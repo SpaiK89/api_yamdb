@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from rest_framework.generics import get_object_or_404
 from rest_framework import serializers
 
@@ -6,16 +7,21 @@ from reviews.models import User, Category, Genre, Title, Review, Comment
 
 class UserSerializer(serializers.ModelSerializer):
 
-
     class Meta:
         model = User
-        fields = ("username", "email", "first_name", "last_name", "bio", "role")
+        fields = (
+            "username", "email", "first_name", "last_name", "bio", "role"
+        )
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-
+    username = serializers.CharField(
+        required=True, max_length=150,
+        validators=[RegexValidator(regex=r"^[\w.@+-]+$")]
+    )
+    # В модели AbstracUser уже используется необходимая валидация
+    # username_validator, но pytest требует еще, то же самое с длиной email
+    email = serializers.EmailField(required=True, max_length=254)
 
     class Meta:
         model = User
@@ -28,13 +34,13 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Нельзя создать пользователя с таким 'username'"
             )
-        if (User.objects.filter(username=username) and
-                User.objects.get(username=username).email != email):
+        if (User.objects.filter(username=username)
+                and User.objects.get(username=username).email != email):
             raise serializers.ValidationError(
                 "Указанный 'username' уже занят, используйте другой"
             )
-        if (User.objects.filter(email=email) and
-                User.objects.get(email=email).username != username):
+        if (User.objects.filter(email=email)
+                and User.objects.get(email=email).username != username):
             raise serializers.ValidationError(
                 "Указанный адрес электронной почты уже занят, используйте "
                 "другой"
@@ -67,7 +73,6 @@ class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True)
     genre = GenreSerializer(read_only=True, many=True)
     category = CategorySerializer(read_only=True)
-
 
     class Meta:
         model = Title
@@ -109,7 +114,6 @@ class ReviewSerializer(serializers.ModelSerializer):
                     'Вы не можете добавить более одного отзыва на произведение'
                 )
         return data
-
 
     class Meta:
         model = Review

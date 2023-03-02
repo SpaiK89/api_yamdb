@@ -11,6 +11,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Title, User, Review
 
 from .filters import TitleFilter
+from .mixins import CategoryAndGenreMixin
 from .permisions import (
     IsAdmin, IsAuthorOrAdminOrModerator, IsAdminOrReadOnly
 )
@@ -26,9 +27,13 @@ from .serializers import (
     ReviewSerializer
 )
 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    http_method_names = ['get', 'post', 'patch', 'head', 'delete']
     serializer_class = UserSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
     permission_classes = (permissions.IsAuthenticated, IsAdmin)
     lookup_field = "username"
 
@@ -47,7 +52,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CategoryAndGenreMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
@@ -56,10 +61,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
-    # добавить Поиск по названию жанра
-    # проверить работу пагинации
-    # добавить permissions IsAdminOrReadOnly
+class GenreViewSet(CategoryAndGenreMixin):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     filter_backends = (filters.SearchFilter,)
@@ -71,10 +73,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = (
-        #permissions.IsAuthenticatedOrReadOnly,
-        IsAdminOrReadOnly,
-    )
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
