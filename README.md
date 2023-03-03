@@ -17,7 +17,7 @@
 
 ### Стек:
 ```
-Python 3.8.6, Django, DRF, Simple-JWT.
+Python 3.8.6, Django, DRF, PostgreSQL, Simple-JWT.
 ```
 
 ### Запуск проекта:

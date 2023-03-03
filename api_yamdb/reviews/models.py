@@ -76,8 +76,6 @@ class Title(models.Model):
         related_name='category',
         verbose_name='Категория',
     )
-    # Убрал поле raiting, так как он должно будет каждый раз вычисляться
-    # во вьюсете Апи
 
     class Meta:
         verbose_name = 'Произведение'

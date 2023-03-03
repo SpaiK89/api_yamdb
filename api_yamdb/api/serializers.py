@@ -14,13 +14,11 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class SignUpSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True, max_length=150,
         validators=[RegexValidator(regex=r"^[\w.@+-]+$")]
     )
-    # В модели AbstracUser уже используется необходимая валидация
-    # username_validator, но pytest требует еще, то же самое с длиной email
     email = serializers.EmailField(required=True, max_length=254)
 
     class Meta:
@@ -48,7 +46,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         return data
 
 
-class TokenSerializer(serializers.ModelSerializer):
+class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 

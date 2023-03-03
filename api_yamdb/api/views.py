@@ -94,8 +94,8 @@ def get_signup(request):
     отправление данного кода по указанному электронному адресу."""
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    username = request.data.get("username")
-    email = request.data.get("email")
+    username = serializer.validated_data["username"]
+    email = serializer.validated_data["email"]
     user, create = User.objects.get_or_create(username=username, email=email)
     confirmation_code = default_token_generator.make_token(user)
 
@@ -113,8 +113,8 @@ def get_token(request):
     возвращает ответ с token."""
     serializer = TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    username = request.data.get("username")
-    confirmation_code = request.data.get("confirmation_code")
+    username = serializer.validated_data["username"]
+    confirmation_code = serializer.validated_data["confirmation_code"]
     user = get_object_or_404(User, username=username)
     if default_token_generator.check_token(user, confirmation_code):
         token = AccessToken.for_user(user)
